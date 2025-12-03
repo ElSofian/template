@@ -659,43 +659,6 @@ export default function DocumentationPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 bg-transparent"
-                    onClick={() => openCreateFolderDialog(null)}
-                  >
-                    <FolderPlus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Nouveau dossier</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Créer un nouveau dossier</DialogTitle>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <Label htmlFor="folder-name">Nom du dossier</Label>
-                    <Input
-                      id="folder-name"
-                      placeholder="Mon nouveau dossier"
-                      value={newFolderName}
-                      onChange={(e) => setNewFolderName(e.target.value)}
-                      className="mt-2"
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") createFolder()
-                      }}
-                    />
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setIsCreateFolderOpen(false)}>
-                      Annuler
-                    </Button>
-                    <Button onClick={createFolder}>Créer</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
               <Button size="sm" className="gap-2">
                 <Upload className="h-4 w-4" />
                 <span className="hidden sm:inline">Importer</span>
@@ -705,70 +668,106 @@ export default function DocumentationPage() {
 
           {/* Documentation Tab */}
           <TabsContent value="docs" className="mt-4">
-            <div className="grid gap-4 lg:grid-cols-[280px,1fr]">
+            <div className="flex gap-0 rounded-xl border bg-card overflow-hidden min-h-[600px]">
               {/* Sidebar */}
-              <div className="rounded-xl border bg-card p-3">
+              <div className="w-[280px] shrink-0 border-r bg-muted/30 p-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3 px-2">
                   <h3 className="text-sm font-medium text-foreground">Dossiers</h3>
-                  <button className="p-1 hover:bg-muted rounded" onClick={() => openCreateFolderDialog(null)}>
-                    <Plus className="h-4 w-4 text-muted-foreground" />
-                  </button>
+                  <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
+                    <DialogTrigger asChild>
+                      <button className="p-1 hover:bg-muted rounded" onClick={() => openCreateFolderDialog(null)}>
+                        <Plus className="h-4 w-4 text-muted-foreground" />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Créer un nouveau dossier</DialogTitle>
+                      </DialogHeader>
+                      <div className="py-4">
+                        <Label htmlFor="folder-name">Nom du dossier</Label>
+                        <Input
+                          id="folder-name"
+                          placeholder="Mon nouveau dossier"
+                          value={newFolderName}
+                          onChange={(e) => setNewFolderName(e.target.value)}
+                          className="mt-2"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") createFolder()
+                          }}
+                        />
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsCreateFolderOpen(false)}>
+                          Annuler
+                        </Button>
+                        <Button onClick={createFolder}>Créer</Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
-                <FolderTree
-                  folders={docFolders}
-                  selectedFolderId={selectedDocFolder?.id ?? null}
-                  onSelectFolder={(f) => selectFolder(f, false)}
-                  expandedFolders={expandedDocFolders}
-                  onToggleExpand={(id) => toggleExpand(id, false)}
-                  onCreateFolder={(parentId) => openCreateFolderDialog(parentId)}
-                  onRenameFolder={() => {}}
-                  onDeleteFolder={() => {}}
-                />
+                <div className="flex-1 overflow-y-auto">
+                  <FolderTree
+                    folders={docFolders}
+                    selectedFolderId={selectedDocFolder?.id ?? null}
+                    onSelectFolder={(f) => selectFolder(f, false)}
+                    expandedFolders={expandedDocFolders}
+                    onToggleExpand={(id) => toggleExpand(id, false)}
+                    onCreateFolder={(parentId) => openCreateFolderDialog(parentId)}
+                    onRenameFolder={() => {}}
+                    onDeleteFolder={() => {}}
+                  />
+                </div>
               </div>
 
-              {/* Content */}
-              <div className="rounded-xl border bg-card p-4">
-                <div className="mb-4">
+              {/* Content - Files panel */}
+              <div className="flex-1 p-4 flex flex-col">
+                <div className="mb-4 pb-3 border-b">
                   <Breadcrumb path={docPath} onNavigate={(index) => navigateBreadcrumb(index, false)} />
                 </div>
-                <FileList files={getCurrentFiles(false)} onDeleteFile={() => {}} />
+                <div className="flex-1 overflow-y-auto">
+                  <FileList files={getCurrentFiles(false)} onDeleteFile={() => {}} />
+                </div>
               </div>
             </div>
           </TabsContent>
 
           {/* Shared Tab */}
           <TabsContent value="shared" className="mt-4">
-            <div className="grid gap-4 lg:grid-cols-[280px,1fr]">
+            <div className="flex gap-0 rounded-xl border bg-card overflow-hidden min-h-[600px]">
               {/* Sidebar */}
-              <div className="rounded-xl border bg-card p-3">
+              <div className="w-[280px] shrink-0 border-r bg-muted/30 p-3 flex flex-col">
                 <div className="flex items-center justify-between mb-3 px-2">
                   <h3 className="text-sm font-medium text-foreground">Dossiers partagés</h3>
                   <button className="p-1 hover:bg-muted rounded" onClick={() => openCreateFolderDialog(null)}>
                     <Plus className="h-4 w-4 text-muted-foreground" />
                   </button>
                 </div>
-                <FolderTree
-                  folders={sharedFolders}
-                  selectedFolderId={selectedSharedFolder?.id ?? null}
-                  onSelectFolder={(f) => selectFolder(f, true)}
-                  expandedFolders={expandedSharedFolders}
-                  onToggleExpand={(id) => toggleExpand(id, true)}
-                  onCreateFolder={(parentId) => openCreateFolderDialog(parentId)}
-                  onRenameFolder={() => {}}
-                  onDeleteFolder={() => {}}
-                />
+                <div className="flex-1 overflow-y-auto">
+                  <FolderTree
+                    folders={sharedFolders}
+                    selectedFolderId={selectedSharedFolder?.id ?? null}
+                    onSelectFolder={(f) => selectFolder(f, true)}
+                    expandedFolders={expandedSharedFolders}
+                    onToggleExpand={(id) => toggleExpand(id, true)}
+                    onCreateFolder={(parentId) => openCreateFolderDialog(parentId)}
+                    onRenameFolder={() => {}}
+                    onDeleteFolder={() => {}}
+                  />
+                </div>
               </div>
 
-              {/* Content */}
-              <div className="rounded-xl border bg-card p-4">
-                <div className="mb-4 flex items-center justify-between">
+              {/* Content - Files panel */}
+              <div className="flex-1 p-4 flex flex-col">
+                <div className="mb-4 pb-3 border-b flex items-center justify-between">
                   <Breadcrumb path={sharedPath} onNavigate={(index) => navigateBreadcrumb(index, true)} />
                   <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Users className="h-3.5 w-3.5" />
                     Client & Vendeur
                   </div>
                 </div>
-                <FileList files={getCurrentFiles(true)} showFrom={true} onDeleteFile={() => {}} />
+                <div className="flex-1 overflow-y-auto">
+                  <FileList files={getCurrentFiles(true)} showFrom={true} onDeleteFile={() => {}} />
+                </div>
               </div>
             </div>
           </TabsContent>
